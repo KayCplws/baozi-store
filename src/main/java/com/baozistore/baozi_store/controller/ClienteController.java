@@ -33,6 +33,17 @@ public class ClienteController {
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
     }
 
+    @PutMapping("/{id}")
+    public Cliente atualizar(@PathVariable Long id, @RequestBody Cliente dados) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+
+        cliente.setNome(dados.getNome());
+        cliente.setEmail(dados.getEmail());
+
+        return clienteRepository.save(cliente);
+    }
+
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Long id) {
         clienteRepository.deleteById(id);
