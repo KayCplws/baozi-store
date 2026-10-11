@@ -4,6 +4,9 @@ package com.baozistore.baozi_store.controller;
 import com.baozistore.baozi_store.model.Cliente;
 import com.baozistore.baozi_store.repository.ClienteRepository;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -18,7 +21,7 @@ public class ClienteController {
     }
 
     @PostMapping
-    public Cliente cadastrar(@RequestBody Cliente cliente) {
+    public Cliente cadastrar(@Valid @RequestBody Cliente cliente) {
         return clienteRepository.save(cliente);
     }
 
@@ -30,11 +33,14 @@ public class ClienteController {
     @GetMapping("/{id}")
     public Cliente buscarPorId(@PathVariable Long id) {
         return clienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Cliente não encontrado"
+                ));
     }
 
     @PutMapping("/{id}")
-    public Cliente atualizar(@PathVariable Long id, @RequestBody Cliente dados) {
+    public Cliente atualizar(@PathVariable Long id, @Valid @RequestBody Cliente dados) {
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
 
@@ -46,6 +52,14 @@ public class ClienteController {
 
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Long id) {
+        if (!clienteRepository.existsById(id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Cliente não encontrado"
+            );
+        }
+
         clienteRepository.deleteById(id);
     }
+
 }
